@@ -3,6 +3,8 @@ const Alexa = require("alexa-sdk");
 const cheerio = require("cheerio");
 const joda = require("js-joda");
 const rp = require("request-promise");
+const ImageUtils = require("alexa-sdk").utils.ImageUtils;
+const TextUtils = require("alexa-sdk").utils.TextUtils;
 
 exports.handler = function (event, context) {
     const alexa = Alexa.handler(event, context);
@@ -38,7 +40,12 @@ const handlers = {
             // get out last day of stocking information and present only information on that day
             const date = stockings[0].date;
             const filtered = stockings.filter(stocking => date.equals(stocking.date));
-            this.emit(":tell", `The last stocking${filtered.length > 1 ? "s were" : " was"} on ${ssmlDate(date)}.  ${filtered.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingLocations(filtered)}.`);
+
+            // TODO: check for too many results after filter
+
+            this.response.speak(`The last stocking${filtered.length > 1 ? "s were" : " was"} on ${ssmlDate(date)}.  ${filtered.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingLocations(filtered)}.`)
+                .renderTemplate(createStockingMapTemplate(filtered));
+            this.emit(':responseReady');
         }).catch(err => {
             console.error(err);
             this.emit("FetchError");
@@ -53,6 +60,8 @@ const handlers = {
                 this.emit(":tell", `There were no stockings for ${ssmlDate(startDate)}`);
                 return;
             }
+
+            // TODO: check for too many results after filter
 
             this.emit(":tell", `On ${ssmlDate(startDate)}, there were ${filtered.length} stocking${filtered.length > 1 ? "s" : ""}.  ${filtered.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingLocations(filtered)}.`);
         }).catch(err => {
@@ -108,7 +117,7 @@ function retrieveStockings() {
         const entries = [];
         $("#stocking-table").find("tbody").find("tr").each((i, elem) => {
             const tds = $(elem).find("td").map((i, td) => $(td).text());
-            entries.push({date: scrubDate(tds[0]), county: tds[1], water: scrubWater(tds[2]), definition: tds[3]});
+            entries.push({date: scrubDate(tds[0]), county: tds[1].trim(), water: scrubWater(tds[2]).trim(), definition: tds[3].trim()});
         });
         return entries;
     });
@@ -117,7 +126,7 @@ function retrieveStockings() {
 function aggregateStockingLocations(locations) {
     const descriptions = locations.map(location => `${location.water.trim()} in ${location.county.trim()}`);
     if (locations.length === 1) {
-        return decriptions[0];
+        return descriptions[0];
     } else {
         return descriptions.map((description, index) => `${index === 0 ? "" : ", "}${index === descriptions.length - 1 ? "and " : ""}${description}`).join("");
     }
@@ -133,4 +142,12 @@ function normalizeSlotDate(value) {
 
 function ssmlDate(date) {
     return `<say-as interpret-as="date" format="md">????${joda.DateTimeFormatter.ofPattern("MMdd").format(date)}</say-as>`;
+}
+
+function createStockingMapTemplate(stockings) {
+    const url = "https://maps.googleapis.com/maps/api/staticmap?&size=340x340&type=hybrid" + stockings.map((stocking, index) => `&markers=label:${index+1}|${stocking.water},${stocking.county},VA`).join("");
+    const builder = new Alexa.templateBuilders.BodyTemplate3Builder();
+    const text = TextUtils.makeRichText(stockings.map((stocking, index) => `${index+1}.&#160;&#160;${stocking.water.trim()}<br/>`).join(""));
+    return builder.setBackButtonBehavior("HIDDEN").setTitle("Trout Stocking Map").setTextContent(text).setImage(ImageUtils.makeImage(url, undefined, undefined, undefined, "Trout Stocking Map with Markers for Locations"))
+        .build();
 }
