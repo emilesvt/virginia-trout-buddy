@@ -1,0 +1,93 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "virginia trout buddy",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.MoreIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateSettingsIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NextIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.PageDownIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.PageUpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.PreviousIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.ScrollDownIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.ScrollLeftIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.ScrollRightIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.ScrollUpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "ListStockings",
+                    "slots": [
+                        {
+                            "name": "StartDate",
+                            "type": "AMAZON.DATE"
+                        },
+                        {
+                            "name": "EndDate",
+                            "type": "AMAZON.DATE"
+                        }
+                    ],
+                    "samples": [
+                        "list stockings",
+                        "give me stocking information",
+                        "where are the trout",
+                        "where should i fish",
+                        "where are the fish",
+                        "recent stocking",
+                        "trout stocking",
+                        "what was stocked on {StartDate}",
+                        "what was stocked between {StartDate} and {EndDate}",
+                        "stockings between {StartDate} and {EndDate}",
+                        "fish added",
+                        "fish added between {StartDate} and {EndDate}",
+                        "fish added on {StartDate}",
+                        "trout added on {StartDate}",
+                        "trout added between {StartDate} and {EndDate}",
+                        "stocking information for {StartDate}",
+                        "stocking information for {StartDate} to {EndDate}"
+                    ]
+                }
+            ]
+        }
+    }
+}

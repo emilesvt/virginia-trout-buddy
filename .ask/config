@@ -1,0 +1,19 @@
+{
+  "deploy_settings": {
+    "default": {
+      "skill_id": "amzn1.ask.skill.6da4434e-71dd-40c5-b557-0bd3dcdb8032",
+      "was_cloned": false,
+      "merge": {
+        "skillManifest": {
+          "apis": {
+            "custom": {
+              "endpoint": {
+                "uri": "ask-custom-virginia-trout-buddy-default"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

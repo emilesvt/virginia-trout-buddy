@@ -1,0 +1,37 @@
+{
+  "skillManifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "summary": "Query VDGIF Trout Stocking Tables",
+          "examplePhrases": [
+            "Alexa open virginia trout buddy",
+            "Alexa ask virginia trout buddy what was stocked on December 5th",
+            "Alexa ask virginia trout buddy when was the recent stocking"
+          ],
+          "name": "Virginia Trout Buddy",
+          "description": "Checking the VDGIF trout stocking schedule."
+        }
+      },
+      "isAvailableWorldwide": false,
+      "testingInstructions": "Sample Testing Instructions.",
+      "category": "EDUCATION_AND_REFERENCE",
+      "distributionCountries": [
+        "US"
+      ]
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "sourceDir": "lambda/custom"
+        },
+        "interfaces": [
+          {
+            "type": "RENDER_TEMPLATE"
+          }
+        ]
+      }
+    },
+    "manifestVersion": "1.0"
+  }
+}
