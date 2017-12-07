@@ -83,7 +83,13 @@ const handlers = {
                 return;
             }
 
-            this.emit(":tell", `For ${county}, there ${filtered.length > 1 ? "were" : "was"} ${filtered.length} stocking${filtered.length > 1 ? "s" : ""}.  ${filtered.length > 1 ? "They were" : "It was"} performed on ${aggregateDates(filtered)}.`);
+            this.response.speak(`For ${county}, there ${filtered.length > 1 ? "were" : "was"} ${filtered.length} stocking${filtered.length > 1 ? "s" : ""}.  ${filtered.length > 1 ? "They were" : "It was"} performed on ${aggregateStockingDates(filtered)}.`);
+
+            if (this.event.context.System.device.supportedInterfaces.Display) {
+                this.response.renderTemplate(createStockingMapTemplate(filtered));
+            }
+
+            this.emit(":responseReady");
         }).catch(err => {
             console.error(err);
             this.emit("FetchError");
@@ -148,29 +154,31 @@ function retrieveStockings() {
     });
 }
 
-function aggregateStockingLocations(locations) {
-    const descriptions = locations.map(location => `${location.water.trim()} in ${location.county.trim()}`);
-    if (locations.length === 1) {
+function aggregateStockingLocations(stockings) {
+    return makeGoodListGrammar(stockings.map(stocking => `${stocking.water} in ${stocking.county}`));
+}
+
+function aggregateStockingDates(stockings) {
+    return makeGoodListGrammar(stockings.map(stocking => `${ssmlDate(stocking.date)} at ${stocking.water}`));
+
+}
+
+function makeGoodListGrammar(descriptions) {
+    if (descriptions.length === 1) {
         return descriptions[0];
     } else {
         return descriptions.map((description, index) => `${index === 0 ? "" : ", "}${index === descriptions.length - 1 ? "and " : ""}${description}`).join("");
     }
 }
 
-function aggregateDates(stockings) {
-    if (stockings.length === 1) {
-        return ssmlDate(stockings[0].date);
-    } else {
-        return stockings.map((stocking, index) => `${index === 0 ? "" : ", "}${index === stocking.length - 1 ? "and " : ""}${ssmlDate(stocking.date)}`).join("");
-    }
-}
-
 function normalizeSlotDate(value) {
-    const date = joda.LocalDate.parse(value);
-    if (date.isAfter(joda.LocalDate.now())) {
-        return date.minusYears(1);
+    if (value) {
+        const date = joda.LocalDate.parse(value);
+        if (date.isAfter(joda.LocalDate.now())) {
+            return date.minusYears(1);
+        }
+        return date;
     }
-    return date;
 }
 
 function ssmlDate(date) {
