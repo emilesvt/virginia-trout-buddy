@@ -47,6 +47,11 @@ const handlers = {
         const startDate = normalizeSlotDate(getSlotValue(this.event.request.intent.slots.StartDate));
         const endDate = normalizeSlotDate(getSlotValue(this.event.request.intent.slots.EndDate));
 
+        if(startDate && endDate) {
+            this.emit("StockingsByRange", startDate, endDate);
+            return;
+        }
+
         retrieveStockings().then(stockings => {
             const filtered = stockings.filter(stocking => stocking.date.equals(startDate));
 
@@ -58,6 +63,30 @@ const handlers = {
 
             // TODO: check for too many results after filter
             this.response.speak(`On ${ssmlDate(startDate)}, there were ${filtered.length} stocking${filtered.length > 1 ? "s" : ""}.  ${filtered.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingLocations(filtered)}.`);
+
+            if (this.event.context.System.device.supportedInterfaces.Display) {
+                this.response.renderTemplate(createStockingMapTemplate(filtered));
+            }
+
+            this.emit(":responseReady");
+        }).catch(err => {
+            console.error(err);
+            this.emit("FetchError");
+        });
+    },
+    "StockingsByRange": function (startDate, endDate) {
+
+        retrieveStockings().then(stockings => {
+            const filtered = stockings.filter(stocking => stocking.date.between(startDate, endDate));
+
+            // check to ensure there was stocking data
+            if (filtered.length === 0) {
+                this.emit(":tell", `There were no stockings between ${ssmlDate(startDate)} and ${ssmlDate(endDate)}`);
+                return;
+            }
+
+            // TODO: check for too many results after filter
+            this.response.speak(`Between ${ssmlDate(startDate)} and ${ssmlDate(endDate)}, there were ${filtered.length} stocking${filtered.length > 1 ? "s" : ""}.  ${filtered.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingAll(filtered)}.`);
 
             if (this.event.context.System.device.supportedInterfaces.Display) {
                 this.response.renderTemplate(createStockingMapTemplate(filtered));
@@ -96,7 +125,7 @@ const handlers = {
         });
     },
     "FetchError": function () {
-        this.emit(":tell", `There was a problem communicating with the <say-as interpret-as="characters">VDGIF</say-as>.`);
+        this.emit(":tell", `There was a problem communicating with the Virginia Department of Game and Inland Fisheries.`);
     },
     "SessionEndedRequest": function () {
         console.log("Session ended with reason: " + this.event.request.reason);
@@ -152,6 +181,10 @@ function retrieveStockings() {
         });
         return entries;
     });
+}
+
+function aggregateStockingAll(stockings) {
+    return makeGoodListGrammar(stockings.map(stocking => `${stocking.water} in ${stocking.county} on ${ssmlDate(stocking.date)}`));
 }
 
 function aggregateStockingLocations(stockings) {

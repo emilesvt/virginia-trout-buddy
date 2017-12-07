@@ -61,7 +61,7 @@
           ],
           "samples": [
             "list stockings",
-            "give me stocking information",
+            "stocking information",
             "where are the trout",
             "where should i fish",
             "where are the fish",
@@ -89,10 +89,15 @@
             "fish added",
             "fish added between {StartDate} and {EndDate}",
             "fish added on {StartDate}",
+            "fish added {StartDate}",
             "trout added on {StartDate}",
             "trout added between {StartDate} and {EndDate}",
             "stocking information for {StartDate}",
-            "stocking information for {StartDate} to {EndDate}"
+            "stocking information for {StartDate} to {EndDate}",
+            "stockings {StartDate}",
+            "stockings on {StartDate}",
+            "trout {StartDate}",
+            "stocking information {StartDate}"
           ]
         },
         {
