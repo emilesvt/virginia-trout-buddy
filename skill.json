@@ -7,7 +7,15 @@
           "examplePhrases": [
             "Alexa open virginia trout buddy",
             "Alexa ask virginia trout buddy what was stocked on December 5th",
-            "Alexa ask virginia trout buddy when was the recent stocking"
+            "Alexa ask virginia trout buddy about the recent stocking"
+          ],
+          "keywords": [
+            "virginia",
+            "trout",
+            "stock",
+            "fishing",
+            "fish",
+            "vdgif"
           ],
           "name": "Virginia Trout Buddy",
           "description": "Checking the VDGIF trout stocking schedule."
@@ -32,6 +40,13 @@
         ]
       }
     },
-    "manifestVersion": "1.0"
+    "manifestVersion": "1.0",
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "isExportCompliant": true,
+      "containsAds": false,
+      "isChildDirected": false,
+      "usesPersonalInfo": false
+    }
   }
 }

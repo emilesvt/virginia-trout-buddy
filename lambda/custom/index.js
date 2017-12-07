@@ -14,22 +14,10 @@ exports.handler = function (event, context) {
 
 const handlers = {
     "LaunchRequest": function () {
-        this.response.speak("Welcome to Virginia Trout Buddy!");
-        this.emit(":responseReady");
+        this.emit(":ask", "Welcome to Virginia Trout Buddy!");
     },
-    "ListStockings": function () {
-        const startDateSlot = this.event.request.intent.slots.StartDate.value;
-        const endDateSlot = this.event.request.intent.slots.EndDate.value;
-
-        if (startDateSlot && !endDateSlot) {
-            this.emit("ListStockingsWithSingleDate", normalizeSlotDate(startDateSlot));
-        } else if (startDateSlot && endDateSlot) {
-            this.emit("ListStockingsWithDateRange", normalizeSlotDate(startDateSlot), normalizeSlotDate(endDateSlot));
-        } else {
-            this.emit("ListStockingsDefault");
-        }
-    },
-    "ListStockingsDefault": function () {
+    "StockingsDefault": function () {
+        console.log(`Received the following event for StockingsDefault: ${JSON.stringify(this.event.request)}`);
         retrieveStockings().then(stockings => {
             // check to ensure there was stocking data
             if (stockings.length === 0) {
@@ -41,17 +29,24 @@ const handlers = {
             const date = stockings[0].date;
             const filtered = stockings.filter(stocking => date.equals(stocking.date));
 
-            // TODO: check for too many results after filter
+            this.response.speak(`The last stocking${filtered.length > 1 ? "s were" : " was"} on ${ssmlDate(date)}.  ${filtered.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingLocations(filtered)}.`);
 
-            this.response.speak(`The last stocking${filtered.length > 1 ? "s were" : " was"} on ${ssmlDate(date)}.  ${filtered.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingLocations(filtered)}.`)
-                .renderTemplate(createStockingMapTemplate(filtered));
+            if (this.event.context.System.device.supportedInterfaces.Display) {
+                this.response.renderTemplate(createStockingMapTemplate(filtered));
+            }
+
             this.emit(':responseReady');
         }).catch(err => {
             console.error(err);
             this.emit("FetchError");
         });
     },
-    "ListStockingsWithSingleDate": function (startDate) {
+    "StockingsByDate": function () {
+        console.log(`Received the following event for StockingsByDate: ${JSON.stringify(this.event.request)}`);
+
+        const startDate = normalizeSlotDate(getSlotValue(this.event.request.intent.slots.StartDate));
+        const endDate = normalizeSlotDate(getSlotValue(this.event.request.intent.slots.EndDate));
+
         retrieveStockings().then(stockings => {
             const filtered = stockings.filter(stocking => stocking.date.equals(startDate));
 
@@ -62,8 +57,33 @@ const handlers = {
             }
 
             // TODO: check for too many results after filter
+            this.response.speak(`On ${ssmlDate(startDate)}, there were ${filtered.length} stocking${filtered.length > 1 ? "s" : ""}.  ${filtered.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingLocations(filtered)}.`);
 
-            this.emit(":tell", `On ${ssmlDate(startDate)}, there were ${filtered.length} stocking${filtered.length > 1 ? "s" : ""}.  ${filtered.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingLocations(filtered)}.`);
+            if (this.event.context.System.device.supportedInterfaces.Display) {
+                this.response.renderTemplate(createStockingMapTemplate(filtered));
+            }
+
+            this.emit(":responseReady");
+        }).catch(err => {
+            console.error(err);
+            this.emit("FetchError");
+        });
+    },
+    "StockingsByCounty": function () {
+        console.log(`Received the following event for StockingsByCounty: ${JSON.stringify(this.event.request)}`);
+
+        const county = getSlotValue(this.event.request.intent.slots.County);
+
+        retrieveStockings().then(stockings => {
+            const filtered = stockings.filter(stocking => stocking.county.toLowerCase() === county.toLowerCase());
+
+            // check to ensure there was stocking data
+            if (filtered.length === 0) {
+                this.emit(":tell", `No stocking information was found for ${county}`);
+                return;
+            }
+
+            this.emit(":tell", `For ${county}, there ${filtered.length > 1 ? "were" : "was"} ${filtered.length} stocking${filtered.length > 1 ? "s" : ""}.  ${filtered.length > 1 ? "They were" : "It was"} performed on ${aggregateDates(filtered)}.`);
         }).catch(err => {
             console.error(err);
             this.emit("FetchError");
@@ -117,7 +137,12 @@ function retrieveStockings() {
         const entries = [];
         $("#stocking-table").find("tbody").find("tr").each((i, elem) => {
             const tds = $(elem).find("td").map((i, td) => $(td).text());
-            entries.push({date: scrubDate(tds[0]), county: tds[1].trim(), water: scrubWater(tds[2]).trim(), definition: tds[3].trim()});
+            entries.push({
+                date: scrubDate(tds[0]),
+                county: tds[1].trim(),
+                water: scrubWater(tds[2]).trim(),
+                definition: tds[3].trim()
+            });
         });
         return entries;
     });
@@ -129,6 +154,14 @@ function aggregateStockingLocations(locations) {
         return descriptions[0];
     } else {
         return descriptions.map((description, index) => `${index === 0 ? "" : ", "}${index === descriptions.length - 1 ? "and " : ""}${description}`).join("");
+    }
+}
+
+function aggregateDates(stockings) {
+    if (stockings.length === 1) {
+        return ssmlDate(stockings[0].date);
+    } else {
+        return stockings.map((stocking, index) => `${index === 0 ? "" : ", "}${index === stocking.length - 1 ? "and " : ""}${ssmlDate(stocking.date)}`).join("");
     }
 }
 
@@ -145,9 +178,17 @@ function ssmlDate(date) {
 }
 
 function createStockingMapTemplate(stockings) {
-    const url = "https://maps.googleapis.com/maps/api/staticmap?&size=340x340&type=hybrid" + stockings.map((stocking, index) => `&markers=label:${index+1}|${stocking.water},${stocking.county},VA`).join("");
+    const url = "https://maps.googleapis.com/maps/api/staticmap?&size=340x340&type=hybrid" + stockings.map((stocking, index) => `&markers=label:${index + 1}|${stocking.water},${stocking.county},VA`).join("");
     const builder = new Alexa.templateBuilders.BodyTemplate3Builder();
-    const text = TextUtils.makeRichText(stockings.map((stocking, index) => `${index+1}.&#160;&#160;${stocking.water.trim()}<br/>`).join(""));
+    const text = TextUtils.makeRichText(stockings.map((stocking, index) => `${index + 1}.&#160;&#160;${stocking.water.trim()}<br/>`).join(""));
     return builder.setBackButtonBehavior("HIDDEN").setTitle("Trout Stocking Map").setTextContent(text).setImage(ImageUtils.makeImage(url, undefined, undefined, undefined, "Trout Stocking Map with Markers for Locations"))
         .build();
+}
+
+function getSlotValue(slot) {
+    if (slot.resolutions && slot.resolutions.resolutionsPerAuthority && slot.resolutions.resolutionsPerAuthority[0].status.code === "ER_SUCCESS_MATCH") {
+        return slot.resolutions.resolutionsPerAuthority[0].values[0].value.name;
+    }
+
+    return slot.value;
 }

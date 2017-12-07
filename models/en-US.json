@@ -1,93 +1,922 @@
 {
-    "interactionModel": {
-        "languageModel": {
-            "invocationName": "virginia trout buddy",
-            "intents": [
-                {
-                    "name": "AMAZON.CancelIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.HelpIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.MoreIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.NavigateSettingsIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.NextIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.PageDownIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.PageUpIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.PreviousIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.ScrollDownIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.ScrollLeftIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.ScrollRightIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.ScrollUpIntent",
-                    "samples": []
-                },
-                {
-                    "name": "AMAZON.StopIntent",
-                    "samples": []
-                },
-                {
-                    "name": "ListStockings",
-                    "slots": [
-                        {
-                            "name": "StartDate",
-                            "type": "AMAZON.DATE"
-                        },
-                        {
-                            "name": "EndDate",
-                            "type": "AMAZON.DATE"
-                        }
-                    ],
-                    "samples": [
-                        "list stockings",
-                        "give me stocking information",
-                        "where are the trout",
-                        "where should i fish",
-                        "where are the fish",
-                        "recent stocking",
-                        "trout stocking",
-                        "what was stocked on {StartDate}",
-                        "what was stocked between {StartDate} and {EndDate}",
-                        "stockings between {StartDate} and {EndDate}",
-                        "fish added",
-                        "fish added between {StartDate} and {EndDate}",
-                        "fish added on {StartDate}",
-                        "trout added on {StartDate}",
-                        "trout added between {StartDate} and {EndDate}",
-                        "stocking information for {StartDate}",
-                        "stocking information for {StartDate} to {EndDate}"
-                    ]
-                }
-            ]
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "virginia trout buddy",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.MoreIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateSettingsIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NextIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageUpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PreviousIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollLeftIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollRightIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollUpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "StockingsDefault",
+          "slots": [
+          ],
+          "samples": [
+            "list stockings",
+            "give me stocking information",
+            "where are the trout",
+            "where should i fish",
+            "where are the fish",
+            "recent stocking",
+            "trout stocking",
+            "fish added"
+          ]
+        },
+        {
+          "name": "StockingsByDate",
+          "slots": [
+            {
+              "name": "StartDate",
+              "type": "AMAZON.DATE"
+            },
+            {
+              "name": "EndDate",
+              "type": "AMAZON.DATE"
+            }
+          ],
+          "samples": [
+            "what was stocked on {StartDate}",
+            "what was stocked between {StartDate} and {EndDate}",
+            "stockings between {StartDate} and {EndDate}",
+            "fish added",
+            "fish added between {StartDate} and {EndDate}",
+            "fish added on {StartDate}",
+            "trout added on {StartDate}",
+            "trout added between {StartDate} and {EndDate}",
+            "stocking information for {StartDate}",
+            "stocking information for {StartDate} to {EndDate}"
+          ]
+        },
+        {
+          "name": "StockingsByCounty",
+          "slots": [
+            {
+              "name": "County",
+              "type": "County"
+            }
+          ],
+          "samples": [
+            "stockings in {County}",
+            "trout in {County}",
+            "stocking for {County}",
+            "fish added in {County}",
+            "trout added in {County}"
+          ]
         }
+      ],
+      "types": [
+        {
+          "values": [
+            {
+              "name": {
+                "value": "Albemarle County",
+                "synonyms": ["Albemarle"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Alexandria",
+                "synonyms": ["Alexandria"]
+              }
+            },
+            {
+              "name": {
+                "value": "Alleghany County",
+                "synonyms": ["Alleghany"]
+              }
+            },
+            {
+              "name": {
+                "value": "Amelia County",
+                "synonyms": ["Amelia"]
+              }
+            },
+            {
+              "name": {
+                "value": "Amherst County",
+                "synonyms": ["Amherst"]
+              }
+            },
+            {
+              "name": {
+                "value": "Appomattox County",
+                "synonyms": ["Appomattox"]
+              }
+            },
+            {
+              "name": {
+                "value": "Arlington County",
+                "synonyms": ["Arlington"]
+              }
+            },
+            {
+              "name": {
+                "value": "Augusta County",
+                "synonyms": ["Augusta"]
+              }
+            },
+            {
+              "name": {
+                "value": "Bath County",
+                "synonyms": ["Bath"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Bedford",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Bedford County",
+                "synonyms": ["Bedford"]
+              }
+            },
+            {
+              "name": {
+                "value": "Bland County",
+                "synonyms": ["Bland"]
+              }
+            },
+            {
+              "name": {
+                "value": "Botetourt County",
+                "synonyms": ["Botetourt"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Bristol",
+                "synonyms": ["Bristol"]
+              }
+            },
+            {
+              "name": {
+                "value": "Brunswick County",
+                "synonyms": ["Brunswick"]
+              }
+            },
+            {
+              "name": {
+                "value": "Buchanan County",
+                "synonyms": ["Buchanan"]
+              }
+            },
+            {
+              "name": {
+                "value": "Buckingham County",
+                "synonyms": ["Buckingham"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Buena Vista",
+                "synonyms": ["Buena Vista"]
+              }
+            },
+            {
+              "name": {
+                "value": "Campbell County",
+                "synonyms": ["Campbell"]
+              }
+            },
+            {
+              "name": {
+                "value": "Caroline County",
+                "synonyms": ["Caroline"]
+              }
+            },
+            {
+              "name": {
+                "value": "Carroll County",
+                "synonyms": ["Carroll"]
+              }
+            },
+            {
+              "name": {
+                "value": "Charles City County",
+                "synonyms": ["Charles City"]
+              }
+            },
+            {
+              "name": {
+                "value": "Charlotte County",
+                "synonyms": ["Charlotte"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Charlottesville",
+                "synonyms": ["Charlottesville"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Chesapeake",
+                "synonyms": ["Chesapeake"]
+              }
+            },
+            {
+              "name": {
+                "value": "Chesterfield County",
+                "synonyms": ["Chesterfield"]
+              }
+            },
+            {
+              "name": {
+                "value": "Clarke County",
+                "synonyms": ["Clarke"]
+              }
+            },
+            {
+              "name": {
+                "value": "Colonial Heights",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "City of Covington",
+                "synonyms": ["Covington"]
+              }
+            },
+            {
+              "name": {
+                "value": "Craig County",
+                "synonyms": ["Craig"]
+              }
+            },
+            {
+              "name": {
+                "value": "Culpeper County",
+                "synonyms": ["Culpeper"]
+              }
+            },
+            {
+              "name": {
+                "value": "Cumberland County",
+                "synonyms": ["Cumberland"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Danville",
+                "synonyms": ["Danville"]
+              }
+            },
+            {
+              "name": {
+                "value": "Dickenson County",
+                "synonyms": ["Dickenson"]
+              }
+            },
+            {
+              "name": {
+                "value": "Dinwiddie County",
+                "synonyms": ["Dinwiddie"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Emporia",
+                "synonyms": ["Emporia"]
+              }
+            },
+            {
+              "name": {
+                "value": "Essex County",
+                "synonyms": ["Essex"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Fairfax",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Fairfax County",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Falls Church",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Fauquier County",
+                "synonyms": ["Fauquier"]
+              }
+            },
+            {
+              "name": {
+                "value": "Floyd County",
+                "synonyms": ["Floyd"]
+              }
+            },
+            {
+              "name": {
+                "value": "Fluvanna County",
+                "synonyms": ["Fluvanna"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Franklin",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Franklin County",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Frederick County",
+                "synonyms": ["Frederick"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Fredericksburg",
+                "synonyms": ["Fredericksburg"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Galax",
+                "synonyms": ["Galax"]
+              }
+            },
+            {
+              "name": {
+                "value": "Giles County",
+                "synonyms": ["Giles"]
+              }
+            },
+            {
+              "name": {
+                "value": "Gloucester County",
+                "synonyms": ["Gloucester"]
+              }
+            },
+            {
+              "name": {
+                "value": "Goochland County",
+                "synonyms": ["Goochland"]
+              }
+            },
+            {
+              "name": {
+                "value": "Grayson County",
+                "synonyms": ["Grayson"]
+              }
+            },
+            {
+              "name": {
+                "value": "Greene County",
+                "synonyms": ["Greene"]
+              }
+            },
+            {
+              "name": {
+                "value": "Greensville County",
+                "synonyms": ["Greensville"]
+              }
+            },
+            {
+              "name": {
+                "value": "Halifax County",
+                "synonyms": ["Halifax"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Hampton",
+                "synonyms": ["Hampton"]
+              }
+            },
+            {
+              "name": {
+                "value": "Hanover County",
+                "synonyms": ["Hanover"]
+              }
+            },
+            {
+              "name": {
+                "value": "Harrisonburg",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Henrico County",
+                "synonyms": ["Henrico"]
+              }
+            },
+            {
+              "name": {
+                "value": "Henry County",
+                "synonyms": ["Henry"]
+              }
+            },
+            {
+              "name": {
+                "value": "Highland County",
+                "synonyms": ["Highland"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Hopewell",
+                "synonyms": ["Hopewell"]
+              }
+            },
+            {
+              "name": {
+                "value": "Isle of Wight County",
+                "synonyms": ["Isle of Wight"]
+              }
+            },
+            {
+              "name": {
+                "value": "James City County",
+                "synonyms": ["James City"]
+              }
+            },
+            {
+              "name": {
+                "value": "King and Queen County",
+                "synonyms": ["King and Queen"]
+              }
+            },
+            {
+              "name": {
+                "value": "King George County",
+                "synonyms": ["King George"]
+              }
+            },
+            {
+              "name": {
+                "value": "King William County",
+                "synonyms": ["King William"]
+              }
+            },
+            {
+              "name": {
+                "value": "Lancaster County",
+                "synonyms": ["Lancaster"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Lee County",
+                "synonyms": ["Lee County"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Lexington",
+                "synonyms": ["Lexington"]
+              }
+            },
+            {
+              "name": {
+                "value": "Loudoun County",
+                "synonyms": ["Loudoun"]
+              }
+            },
+            {
+              "name": {
+                "value": "Louisa County",
+                "synonyms": ["Louisa"]
+              }
+            },
+            {
+              "name": {
+                "value": "Lunenburg County",
+                "synonyms": ["Lunenburg"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Lynchburg",
+                "synonyms": ["Lynchburg"]
+              }
+            },
+            {
+              "name": {
+                "value": "Madison County",
+                "synonyms": ["Madison"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Manassas",
+                "synonyms": ["Manassas"]
+              }
+            },
+            {
+              "name": {
+                "value": "Manassas Park",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Martinsville",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Mathews County",
+                "synonyms": ["Mathews"]
+              }
+            },
+            {
+              "name": {
+                "value": "Mecklenburg County",
+                "synonyms": ["Mecklenburg"]
+              }
+            },
+            {
+              "name": {
+                "value": "Middlesex County",
+                "synonyms": ["Middlesex"]
+              }
+            },
+            {
+              "name": {
+                "value": "Montgomery County",
+                "synonyms": ["Montgomery"]
+              }
+            },
+            {
+              "name": {
+                "value": "Nelson County",
+                "synonyms": ["Nelson"]
+              }
+            },
+            {
+              "name": {
+                "value": "New Kent County",
+                "synonyms": ["New Kent"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Newport News",
+                "synonyms": ["Newport News"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Norfolk",
+                "synonyms": ["Norfolk"]
+              }
+            },
+            {
+              "name": {
+                "value": "Northampton County",
+                "synonyms": ["Northampton"]
+              }
+            },
+            {
+              "name": {
+                "value": "Northumberland County",
+                "synonyms": ["Northumberland"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Norton",
+                "synonyms": ["Norton"]
+              }
+            },
+            {
+              "name": {
+                "value": "Nottoway County",
+                "synonyms": ["Nottoway"]
+              }
+            },
+            {
+              "name": {
+                "value": "Orange County",
+                "synonyms": ["Orange"]
+              }
+            },
+            {
+              "name": {
+                "value": "Page County",
+                "synonyms": ["Page"]
+              }
+            },
+            {
+              "name": {
+                "value": "Patrick County",
+                "synonyms": ["Patrick"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Petersburg",
+                "synonyms": ["Petersburg"]
+              }
+            },
+            {
+              "name": {
+                "value": "Pittsylvania County",
+                "synonyms": ["Pittsylvania"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Poquoson",
+                "synonyms": ["Poquoson"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Portsmouth",
+                "synonyms": ["Portsmouth"]
+              }
+            },
+            {
+              "name": {
+                "value": "Powhatan County",
+                "synonyms": ["Powhatan"]
+              }
+            },
+            {
+              "name": {
+                "value": "Prince Edward County",
+                "synonyms": ["Prince Edward"]
+              }
+            },
+            {
+              "name": {
+                "value": "Prince George County",
+                "synonyms": ["Prince George"]
+              }
+            },
+            {
+              "name": {
+                "value": "Prince William County",
+                "synonyms": ["Prince William"]
+              }
+            },
+            {
+              "name": {
+                "value": "Pulaski County",
+                "synonyms": ["Pulaski"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Radford",
+                "synonyms": ["Radford"]
+              }
+            },
+            {
+              "name": {
+                "value": "Rappahannock County",
+                "synonyms": ["Rappahannock"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Richmond",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Richmond County",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "City of Roanoke",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Roanoke County",
+                "synonyms": []
+              }
+            },
+            {
+              "name": {
+                "value": "Rockbridge County",
+                "synonyms": ["Rockbridge"]
+              }
+            },
+            {
+              "name": {
+                "value": "Rockingham County",
+                "synonyms": ["Rockingham"]
+              }
+            },
+            {
+              "name": {
+                "value": "Russell County",
+                "synonyms": ["Russell"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Salem",
+                "synonyms": ["Salem"]
+              }
+            },
+            {
+              "name": {
+                "value": "Scott County",
+                "synonyms": ["Scott"]
+              }
+            },
+            {
+              "name": {
+                "value": "Shenandoah County",
+                "synonyms": ["Shenandoah"]
+              }
+            },
+            {
+              "name": {
+                "value": "Smyth County",
+                "synonyms": ["Smyth"]
+              }
+            },
+            {
+              "name": {
+                "value": "Southampton County",
+                "synonyms": ["Southampton"]
+              }
+            },
+            {
+              "name": {
+                "value": "Spotsylvania County",
+                "synonyms": ["Spotsylvania"]
+              }
+            },
+            {
+              "name": {
+                "value": "Stafford County",
+                "synonyms": ["Stafford"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Staunton",
+                "synonyms": ["Staunton"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Suffolk",
+                "synonyms": ["Suffolk"]
+              }
+            },
+            {
+              "name": {
+                "value": "Surry County",
+                "synonyms": ["Surry"]
+              }
+            },
+            {
+              "name": {
+                "value": "Sussex County",
+                "synonyms": ["Sussex"]
+              }
+            },
+            {
+              "name": {
+                "value": "Tazewell County",
+                "synonyms": ["Tazewell"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Virginia Beach",
+                "synonyms": ["Virginia Beach"]
+              }
+            },
+            {
+              "name": {
+                "value": "Warren County",
+                "synonyms": ["Warren"]
+              }
+            },
+            {
+              "name": {
+                "value": "Washington County",
+                "synonyms": ["Washington"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Waynesboro",
+                "synonyms": ["Waynesboro"]
+              }
+            },
+            {
+              "name": {
+                "value": "Westmoreland County",
+                "synonyms": ["Westmoreland"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Williamsburg",
+                "synonyms": ["Williamsburg"]
+              }
+            },
+            {
+              "name": {
+                "value": "City of Winchester",
+                "synonyms": ["Winchester"]
+              }
+            },
+            {
+              "name": {
+                "value": "Wise County",
+                "synonyms": ["Wise"]
+              }
+            },
+            {
+              "name": {
+                "value": "Wythe County",
+                "synonyms": ["Wythe"]
+              }
+            },
+            {
+              "name": {
+                "value": "York County",
+                "synonyms": ["York"]
+              }
+            }
+          ],
+          "name": "County"
+        }
+      ]
     }
+  }
 }
