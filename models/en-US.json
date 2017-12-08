@@ -101,7 +101,11 @@
             "stockings {StartDate}",
             "stockings on {StartDate}",
             "trout {StartDate}",
-            "stocking information {StartDate}"
+            "stocking information {StartDate}",
+            "{StartDate}",
+            "on {StartDate}",
+            "{StartDate} and {EndDate}",
+            "between {StartDate} and {EndDate}"
           ]
         },
         {
@@ -118,7 +122,8 @@
             "stocking for {County}",
             "fish added in {County}",
             "trout added in {County}",
-            "{County}"
+            "{County}",
+            "in {County}"
           ]
         }
       ],

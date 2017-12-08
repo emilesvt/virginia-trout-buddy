@@ -1,10 +1,12 @@
 "use strict";
 const Alexa = require("alexa-sdk");
 const cheerio = require("cheerio");
-const joda = require("js-joda");
+const moment = require("moment");
 const rp = require("request-promise");
 const ImageUtils = require("alexa-sdk").utils.ImageUtils;
 const TextUtils = require("alexa-sdk").utils.TextUtils;
+
+const MAX_RESULTS = 6;
 
 exports.handler = function (event, context) {
     const alexa = Alexa.handler(event, context);
@@ -27,7 +29,7 @@ const handlers = {
 
             // get out last day of stocking information and present only information on that day
             const date = stockings[0].date;
-            const filtered = stockings.filter(stocking => date.equals(stocking.date));
+            const filtered = stockings.filter(stocking => date.isSame(stocking.date));
 
             this.response.speak(`The last stocking${filtered.length > 1 ? "s were" : " was"} on ${ssmlDate(date)}.  ${filtered.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingLocations(filtered)}.`);
 
@@ -44,40 +46,63 @@ const handlers = {
     "StockingsByDate": function () {
         console.log(`Received the following event for StockingsByDate: ${JSON.stringify(this.event.request)}`);
 
-        const startDate = normalizeSlotDate(getSlotValue(this.event.request.intent.slots.StartDate));
-        const endDate = normalizeSlotDate(getSlotValue(this.event.request.intent.slots.EndDate));
+        try {
+            const startDate = normalizeSlotDate(getSlotValue(this.event.request.intent.slots.StartDate));
+            const endDate = normalizeSlotDate(getSlotValue(this.event.request.intent.slots.EndDate));
 
-        if (startDate && endDate) {
-            this.emit("StockingsByRange", startDate, endDate);
-            return;
-        }
-
-        retrieveStockings(startDate).then(stockings => {
-            // check to ensure there was stocking data
-            if (stockings.length === 0) {
-                this.emit(":tell", `There were no stockings for ${ssmlDate(startDate)}`);
+            if (startDate && endDate) {
+                this.emit("StockingsByRange", startDate, endDate);
+                return;
+            } else if (this.event.request.intent.slots.StartDate.value &&
+                this.event.request.intent.slots.StartDate.value.indexOf("W") !== -1) {
+                this.emit("StockingsByRange", startDate, moment(startDate).days(startDate.days() + 6));
                 return;
             }
 
-            // TODO: check for too many results after filter
-            this.response.speak(`On ${ssmlDate(startDate)}, there were ${stockings.length} stocking${stockings.length > 1 ? "s" : ""}.  ${stockings.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingLocations(stockings)}.`);
+            retrieveStockings(startDate).then(stockings => {
+                // check to ensure there was stocking data
+                if (stockings.length === 0) {
+                    this.emit(":tell", `There were no stockings for ${ssmlDate(startDate)}`);
+                    return;
+                } else if (stockings.length > MAX_RESULTS) {
+                    this.emit("TooManyResults");
+                    return;
+                }
 
-            if (this.event.context.System.device.supportedInterfaces.Display) {
-                this.response.renderTemplate(createStockingMapTemplate(stockings));
+                // TODO: check for too many results after filter
+                this.response.speak(`On ${ssmlDate(startDate)}, there were ${stockings.length} stocking${stockings.length > 1 ? "s" : ""}.  ${stockings.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingLocations(stockings)}.`);
+
+                if (this.event.context.System.device.supportedInterfaces.Display) {
+                    this.response.renderTemplate(createStockingMapTemplate(stockings));
+                }
+
+                this.emit(":responseReady");
+            }).catch(err => {
+                console.error(err);
+                this.emit("FetchError");
+            });
+        } catch (e) {
+            if (e.message === "InvalidDate") {
+                this.emit("InvalidDateInput");
+            } else {
+                throw e;
             }
-
-            this.emit(":responseReady");
-        }).catch(err => {
-            console.error(err);
-            this.emit("FetchError");
-        });
+        }
     },
     "StockingsByRange": function (startDate, endDate) {
+
+        if (startDate.isAfter(endDate)) {
+            this.emit(":tell", `An invalid date range has been provided.  Please use a valid date range.`);
+            return;
+        }
 
         retrieveStockings(startDate, endDate).then(stockings => {
             // check to ensure there was stocking data
             if (stockings.length === 0) {
                 this.emit(":tell", `There were no stockings between ${ssmlDate(startDate)} and ${ssmlDate(endDate)}`);
+                return;
+            } else if (stockings.length > MAX_RESULTS) {
+                this.emit("TooManyResults");
                 return;
             }
 
@@ -123,6 +148,12 @@ const handlers = {
     "FetchError": function () {
         this.emit(":tell", `There was a problem communicating with the Virginia Department of Game and Inland Fisheries.`);
     },
+    "TooManyResults": function () {
+        this.emit(":tell", `There were too many stockings to discuss.  Trying narrowing your search`);
+    },
+    "InvalidDateInput": function () {
+        this.emit(":tell", `A date provided was invalid. Please try your request again using a valid date like <say-as interpret-as="date" format="md">????1205}</say-as>`);
+    },
     "SessionEndedRequest": function () {
         console.log("Session ended with reason: " + this.event.request.reason);
     },
@@ -141,12 +172,12 @@ const handlers = {
 };
 
 function scrubDate(value) {
-    return joda.LocalDateTime.ofInstant(joda.Instant.ofEpochMilli(Date.parse(value))).toLocalDate();
+    return moment(Date.parse(value));
 }
 
 function scrubWater(value) {
     value = value.replace("&", "and");
-    
+
     if (value && value.indexOf("(") > 0) {
         return value.substring(0, value.indexOf("("));
     }
@@ -160,13 +191,13 @@ function retrieveStockings(startDate, endDate) {
     // https://www.dgif.virginia.gov/fishing/trout-stocking-schedule/?start_date=11%2F01%2F2017&end_date=12%2F07%2F2017
     let url = "https://www.dgif.virginia.gov/fishing/trout-stocking-schedule/";
     if (startDate) {
-        url += `?start_date=${encodeURIComponent(joda.DateTimeFormatter.ofPattern("MM/dd/yyyy").format(startDate))}`;
+        url += `?start_date=${encodeURIComponent(startDate.format("MM/DD/YYYY"))}`;
     }
 
     endDate = endDate ? endDate : startDate;
 
     if (endDate) {
-        url += `&end_date=${encodeURIComponent(joda.DateTimeFormatter.ofPattern("MM/dd/yyyy").format(endDate))}`;
+        url += `&end_date=${encodeURIComponent(endDate.format("MM/DD/YYYY"))}`;
     }
 
     console.log(`Using ${url} for the query`);
@@ -218,16 +249,24 @@ function makeGoodListGrammar(descriptions) {
 
 function normalizeSlotDate(value) {
     if (value) {
-        const date = joda.LocalDate.parse(value);
-        if (date.isAfter(joda.LocalDate.now())) {
-            return date.minusYears(1);
+        let date = moment(value);
+
+        if (date.isValid()) {
+            if (date.isAfter(moment())) {
+                date.year(date.year() - 1);
+            }
+        } else if (value.length === 4) {
+            date = moment(`${value}-01-01`)
+        } else {
+            throw new Error("InvalidDate");
         }
+
         return date;
     }
 }
 
 function ssmlDate(date) {
-    return `<say-as interpret-as="date" format="md">????${joda.DateTimeFormatter.ofPattern("MMdd").format(date)}</say-as>`;
+    return `<say-as interpret-as="date" format="md">????${date.format("MMDD")}</say-as>`;
 }
 
 function createStockingMapTemplate(stockings) {
@@ -244,7 +283,4 @@ function getSlotValue(slot) {
     }
 
     return slot.value;
-}
-
-function validateDate(date) {
 }
