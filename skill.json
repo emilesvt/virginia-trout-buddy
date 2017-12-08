@@ -3,11 +3,11 @@
     "publishingInformation": {
       "locales": {
         "en-US": {
-          "summary": "Query VDGIF Trout Stocking Reports",
+          "summary": "Query Virginia Department of Game & Inland Fisheries trout stocking tables.",
           "examplePhrases": [
             "Alexa ask virginia trout buddy about recent stockings",
             "Alexa ask virginia trout buddy about stockings on December 5th",
-            "Alexa ask virginia trout buddy about stockings in Rockingham County"
+            "Alexa ask virginia trout buddy about stockings in Montgomery County"
           ],
           "keywords": [
             "virginia",
@@ -18,7 +18,7 @@
             "vdgif"
           ],
           "name": "Virginia Trout Buddy",
-          "description": "<p>Get information on past Virginia Department of Game & Inland Fisheries trout stocking.</p><p>You can ask for recent stockings, stockings for a specific date, stockings for a date range, or stockings for a specific county.</p><p>This Skill is in no way affiliated with the VDGIF.</p>"
+          "description": "Get information on past Virginia Department of Game & Inland Fisheries trout stocking. You can ask for recent stockings, stockings for a specific date, stockings for a date range, or stockings for a specific county. Note - the VDGIF does not provide future dates, they report after the stocking has been completed. This Skill is in no way affiliated with the Virginia Department of Game & Inland Fisheries."
         }
       },
       "isAvailableWorldwide": false,

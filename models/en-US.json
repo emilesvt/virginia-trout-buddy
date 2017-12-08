@@ -67,7 +67,11 @@
             "where are the fish",
             "recent stocking",
             "trout stocking",
-            "fish added"
+            "recent stockings",
+            "trout stockings",
+            "fish added",
+            "give me the fish locations",
+            "identify the honey holes"
           ]
         },
         {
@@ -113,7 +117,8 @@
             "trout in {County}",
             "stocking for {County}",
             "fish added in {County}",
-            "trout added in {County}"
+            "trout added in {County}",
+            "{County}"
           ]
         }
       ],

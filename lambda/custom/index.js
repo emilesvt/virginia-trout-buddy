@@ -14,7 +14,7 @@ exports.handler = function (event, context) {
 
 const handlers = {
     "LaunchRequest": function () {
-        this.emit(":ask", "Welcome to Virginia Trout Buddy!");
+        this.emit(":ask", "Welcome to Virginia Trout Buddy! Try asking for recent stockings or stockings on a specific day.");
     },
     "StockingsDefault": function () {
         console.log(`Received the following event for StockingsDefault: ${JSON.stringify(this.event.request)}`);
@@ -47,25 +47,23 @@ const handlers = {
         const startDate = normalizeSlotDate(getSlotValue(this.event.request.intent.slots.StartDate));
         const endDate = normalizeSlotDate(getSlotValue(this.event.request.intent.slots.EndDate));
 
-        if(startDate && endDate) {
+        if (startDate && endDate) {
             this.emit("StockingsByRange", startDate, endDate);
             return;
         }
 
-        retrieveStockings().then(stockings => {
-            const filtered = stockings.filter(stocking => stocking.date.equals(startDate));
-
+        retrieveStockings(startDate).then(stockings => {
             // check to ensure there was stocking data
-            if (filtered.length === 0) {
+            if (stockings.length === 0) {
                 this.emit(":tell", `There were no stockings for ${ssmlDate(startDate)}`);
                 return;
             }
 
             // TODO: check for too many results after filter
-            this.response.speak(`On ${ssmlDate(startDate)}, there were ${filtered.length} stocking${filtered.length > 1 ? "s" : ""}.  ${filtered.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingLocations(filtered)}.`);
+            this.response.speak(`On ${ssmlDate(startDate)}, there were ${stockings.length} stocking${stockings.length > 1 ? "s" : ""}.  ${stockings.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingLocations(stockings)}.`);
 
             if (this.event.context.System.device.supportedInterfaces.Display) {
-                this.response.renderTemplate(createStockingMapTemplate(filtered));
+                this.response.renderTemplate(createStockingMapTemplate(stockings));
             }
 
             this.emit(":responseReady");
@@ -76,20 +74,18 @@ const handlers = {
     },
     "StockingsByRange": function (startDate, endDate) {
 
-        retrieveStockings().then(stockings => {
-            const filtered = stockings.filter(stocking => stocking.date.between(startDate, endDate));
-
+        retrieveStockings(startDate, endDate).then(stockings => {
             // check to ensure there was stocking data
-            if (filtered.length === 0) {
+            if (stockings.length === 0) {
                 this.emit(":tell", `There were no stockings between ${ssmlDate(startDate)} and ${ssmlDate(endDate)}`);
                 return;
             }
 
             // TODO: check for too many results after filter
-            this.response.speak(`Between ${ssmlDate(startDate)} and ${ssmlDate(endDate)}, there were ${filtered.length} stocking${filtered.length > 1 ? "s" : ""}.  ${filtered.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingAll(filtered)}.`);
+            this.response.speak(`Between ${ssmlDate(startDate)} and ${ssmlDate(endDate)}, there were ${stockings.length} stocking${stockings.length > 1 ? "s" : ""}.  ${stockings.length > 1 ? "They were" : "It was"} performed at ${aggregateStockingAll(stockings)}.`);
 
             if (this.event.context.System.device.supportedInterfaces.Display) {
-                this.response.renderTemplate(createStockingMapTemplate(filtered));
+                this.response.renderTemplate(createStockingMapTemplate(stockings));
             }
 
             this.emit(":responseReady");
@@ -134,7 +130,7 @@ const handlers = {
         this.emit("AMAZON.CancelIntent");
     },
     "AMAZON.HelpIntent": function () {
-        this.emit(":tell", "You can try asking for recent stockings or stockings on a specific day.");
+        this.emit(":ask", "You can try asking for recent stockings or stockings on a specific day. What county would you like to fish in in the state of Virginia?");
     },
     "AMAZON.CancelIntent": function () {
         this.emit(":tell", "Bye");
@@ -149,6 +145,8 @@ function scrubDate(value) {
 }
 
 function scrubWater(value) {
+    value = value.replace("&", "and");
+    
     if (value && value.indexOf("(") > 0) {
         return value.substring(0, value.indexOf("("));
     }
@@ -158,10 +156,23 @@ function scrubWater(value) {
     return value;
 }
 
-function retrieveStockings() {
+function retrieveStockings(startDate, endDate) {
+    // https://www.dgif.virginia.gov/fishing/trout-stocking-schedule/?start_date=11%2F01%2F2017&end_date=12%2F07%2F2017
+    let url = "https://www.dgif.virginia.gov/fishing/trout-stocking-schedule/";
+    if (startDate) {
+        url += `?start_date=${encodeURIComponent(joda.DateTimeFormatter.ofPattern("MM/dd/yyyy").format(startDate))}`;
+    }
+
+    endDate = endDate ? endDate : startDate;
+
+    if (endDate) {
+        url += `&end_date=${encodeURIComponent(joda.DateTimeFormatter.ofPattern("MM/dd/yyyy").format(endDate))}`;
+    }
+
+    console.log(`Using ${url} for the query`);
     return rp({
         method: "GET",
-        uri: "https://www.dgif.virginia.gov/fishing/trout-stocking-schedule",
+        uri: url,
         headers: {
             "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36"
         },
@@ -179,6 +190,7 @@ function retrieveStockings() {
                 definition: tds[3].trim()
             });
         });
+        console.log(`${entries.length} entries found for url ${url}`);
         return entries;
     });
 }
@@ -232,4 +244,7 @@ function getSlotValue(slot) {
     }
 
     return slot.value;
+}
+
+function validateDate(date) {
 }
