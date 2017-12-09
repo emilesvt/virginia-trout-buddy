@@ -8,8 +8,11 @@ const TextUtils = require("alexa-sdk").utils.TextUtils;
 
 const MAX_RESULTS = 6;
 
+const APP_ID = "amzn1.ask.skill.6da4434e-71dd-40c5-b557-0bd3dcdb8032";
+
 exports.handler = function (event, context) {
     const alexa = Alexa.handler(event, context);
+    alexa.APP_ID = APP_ID;
     alexa.registerHandlers(handlers);
     alexa.execute();
 };
