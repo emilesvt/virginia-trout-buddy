@@ -18,11 +18,13 @@
             "vdgif"
           ],
           "name": "Virginia Trout Buddy",
-          "description": "Get information on past Virginia Department of Game & Inland Fisheries trout stocking. You can ask for recent stockings, stockings for a specific date, stockings for a date range, or stockings for a specific county. Note - the VDGIF does not provide future dates, they report after the stocking has been completed. This Skill is in no way affiliated with the Virginia Department of Game & Inland Fisheries."
+          "description": "Get information on past Virginia Department of Game & Inland Fisheries trout stocking. You can ask for recent stockings, stockings for a specific date, stockings for a date range, or stockings for a specific county. Note - the VDGIF does not provide future dates, they report after the stocking has been completed. Virginia Trout Buddy is Echo Show enabled, plotting stocking locations on a map of Virginia. This Skill is in no way affiliated with the Virginia Department of Game & Inland Fisheries.",
+          "smallIconUri": "https://s3.amazonaws.com/va-trout-buddy/icon_108.png",
+          "largeIconUri": "https://s3.amazonaws.com/va-trout-buddy/icon_512.png"
         }
       },
       "isAvailableWorldwide": false,
-      "testingInstructions": "Reference the trout stocking table at https://www.dgif.virginia.gov/fishing/trout-stocking-schedule/ to test.",
+      "testingInstructions": "Latest submission only contains new full description text of being Echo Show enabled.  Reference the trout stocking table at https://www.dgif.virginia.gov/fishing/trout-stocking-schedule/ to test.",
       "category": "EDUCATION_AND_REFERENCE",
       "distributionCountries": [
         "US"
