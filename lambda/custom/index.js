@@ -127,7 +127,11 @@ const handlers = {
 
         const county = getSlotValue(this.event.request.intent.slots.County);
 
-        retrieveStockings().then(stockings => {
+        const endDate = moment();
+        const startDate = moment(endDate);
+        startDate.month(endDate.month() - 2);
+
+        retrieveStockings(startDate, endDate).then(stockings => {
             const filtered = stockings.filter(stocking => stocking.county.toLowerCase() === county.toLowerCase());
 
             // check to ensure there was stocking data
